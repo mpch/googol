@@ -13,7 +13,7 @@
 	define('LANGUAGE',$langue);
 	define('RACINE','http://'.$_SERVER['SERVER_NAME']);
 	define('USE_WEB_OF_TRUST',true);
-	define('ORANGE_PROXY_URL','');
+	define('ORANGE_PROXY_URL','http://proxy.warriordudimanche.net/index.php?url=');
 	define('WOT_URL','http://www.mywot.com/scorecard/');
 	define('REGEX_WEB','#(?<=<h3 class="r"><a href="/url\?q=)([^&]+).*?>(.*?)</a>.*?(?<=<span class="st">)(.*?)(?=</span>)#s');
 	define('REGEX_PAGES','#&start=([0-9]+)|&start=([0-9]+)#');
@@ -101,12 +101,29 @@
 		);
 	$bangs=array(
 		'!ddg'=>'https://duckduckgo.com/?q=',
+		'!gi'=>'https://www.google.fr/search?hl=fr&tbm=isch&biw=6366&bih=6628&q=test&oq=',
 		);
+
 
 	#######################################################################
 	## Fonctions
 	#######################################################################
 	function aff($a,$stop=true,$line){echo 'Arret a la ligne '.$line.' du fichier '.__FILE__.'<pre>';print_r($a);echo '</pre>';if ($stop){exit();}}
+	
+	function proxyfie($str){
+		// returns a modified url: complete with ORANGE_PROXY if not empty and
+		// hides the url
+		if (ORANGE_PROXY_URL){
+			$newurl='';
+			for($i=0;$i<strlen($str);$i++){
+				$newurl.=$str[$i].'0';
+			}
+			return ORANGE_PROXY_URL.$newurl;
+		}else{
+			return $str;
+		}
+
+	}
 	function msg($m){global $lang;if(isset($lang[LANGUAGE][$m])){return $lang[LANGUAGE][$m];}else{return $m;}}
 	function lang($default='fr'){if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){$l=explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);return substr($l[0],0,2);}else{return $default;}}
 	function return_safe_search_level(){
@@ -277,13 +294,16 @@
 	function width($w,$h,$nh){return round(($nh*$w)/$h);}
 	function render_query($array){
 		global $start,$langue,$mode,$couleur,$taille;
-		if (!is_array($array)||count($array['urlimg'])==0&&count($array['link'])){echo '<div class="noresult"> '.msg('no results for').' <em>'.strip_tags($array['query']).'</em> </div>';return false;}
+		if (!is_array($array)
+			||!isset($array['urlimg'])&&!isset($array['links'])
+			||isset($array['urlimg'])&&count($array['urlimg'])==0&&count($array['link']))
+			{echo '<div class="noresult"> '.msg('no results for').' <em>'.strip_tags($array['query']).'</em> </div>';return false;}
 		if ($mode=='web'){
 			echo '<ol start="'.$start.'">';
 			$nbresultsperpage=100;
 			$filtre='';
 			foreach ($array['links'] as $nb => $link){
-				if (ORANGE_PROXY_URL){$orange_proxy_link='<a class=" wot-exclude" title="proxy" href="'.ORANGE_PROXY_URL.$link.'"> (proxy)</a>';}else{$orange_proxy_link='';}
+				if (ORANGE_PROXY_URL){$orange_proxy_link='<a class=" wot-exclude" title="proxy" href="'.proxyfie($link).'"> (proxy)</a>';}else{$orange_proxy_link='';}
 		
 				$r=str_replace('#link',urldecode($link),TPL);
 				$r=str_replace('#title',$array['titles'][$nb],$r);
@@ -304,7 +324,7 @@
 			$common_height=min($array['tw']);
 			
 			foreach ($array['urlimg'] as $nb => $link){
-				if (ORANGE_PROXY_URL){$orange_proxy_link='<a class="o_p wot-exclude" title="proxy" href="'.ORANGE_PROXY_URL.$link.'">&nbsp;</a>';}else{$orange_proxy_link='';}
+				if (ORANGE_PROXY_URL){$orange_proxy_link='<a class="o_p wot-exclude" title="proxy" href="'.proxyfie($link).'">&nbsp;</a>';}else{$orange_proxy_link='';}
 		
 				$r=str_replace('#link',$link,TPLIMG);
 				$r=str_replace('#proxylink',$orange_proxy_link,$r);
@@ -330,7 +350,7 @@
 			$nbresultsperpage=10;
 			$filtre='';
 			foreach ($array['links'] as $nb => $link){
-				if (ORANGE_PROXY_URL){$orange_proxy_link='<a class="o_p wot-exclude" title="proxy" href="'.ORANGE_PROXY_URL.$link.'">&nbsp;</a>';}else{$orange_proxy_link='';}
+				if (ORANGE_PROXY_URL){$orange_proxy_link='<a class="o_p wot-exclude" title="proxy" href="'.proxyfie($link).'">&nbsp;</a>';}else{$orange_proxy_link='';}
 		
 				$array['description'][$nb]=link2YoutubeUser($array['description'][$nb],$link);
 				$r=str_replace('#link',$link,TPLVID);
@@ -348,7 +368,7 @@
 
 		}
 
-		if($array['nb_pages'] != 0){
+		if(!empty($array['nb_pages'])){
 			echo '<hr/><p class="footerlogo">'.LOGO1.str_repeat('<em class="o2">o</em>', $array['nb_pages']-1).LOGO2.'</p><div class="pagination">';
 			if ($start>0){echo '<a class="previous" title="'.msg('previous').'" href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.($start-$nbresultsperpage).'&lang='.$langue.$filtre.'">&#9668;</a>';}
 			for ($i=0;$i<$array['nb_pages']-1;$i++){
@@ -399,7 +419,7 @@
 	function handle_bangs($q){
 		global $bangs;
 		foreach ($bangs as $bang=>$url){
-			if ( strtolower( (substr($q,0,strlen($bang)))) ==strtolower($bang)){header('location: '.$url.str_replace($bang,'',$q));exit();}
+			if ( strtolower( (substr($q,0,strlen($bang)))) ==strtolower($bang)){header('location: '.proxyfie($url.str_replace($bang,'',$q)));exit();}
 		}
 
 	}
@@ -418,8 +438,10 @@
 		$q_raw=$_GET['q'];
 		$q_txt=strip_tags($_GET['q']);
 		$title=$q_txt.' - Googol '.msg('search ');
+		$noqueryclass='';
 	}else{
 		$q_txt=$q_raw='';$title=msg('Googol - google without lies');
+		$noqueryclass=' noqueryclass ';
 	}
 
 ?>
@@ -450,10 +472,16 @@
 			<a href="http://duckduckgo.com" title="<?php echo msg('Otherwise, use a real Search engine !');?>" class="ddg wot-exclude "> </a>
 		</span>
 	</p>
-	
+<nav>
+<?php 
+	if ($mode=='web'){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
+	else if($mode=='images'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li class="active">Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
+	else { echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li class="active">'.msg('Videos').'</li>';}
+?>	
+</nav>	
 	<form action="" method="get" >
 		<input type="hidden" name="lang" value="<?php echo LANGUAGE;?>"/>
-		<span class="logo"><?php echo LOGO1.LOGO2; ?></span>
+		<span class="logo <?php echo $noqueryclass;?>"><?php echo LOGO1.LOGO2; ?></span>
 		<span>
 			<input type="text" name="q" placeholder="<?php echo msg('Search'); ?>" value="<?php  echo $q_txt; ?>"/>
 			<input type="submit" value="OK"/>
@@ -522,7 +550,7 @@
 
 
 	</form>
-	<p class="msg nomobile">
+	<p class="msg nomobile <?php echo $noqueryclass;?>">
 		<?php 
 			echo msg('Search anonymously on Google (direct links, fake referer)'); 
 			if ($mode!='web'){	echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google…');	} 
@@ -530,14 +558,8 @@
 	</p>
 		
 </header>
-<nav>
-<?php 
-	if ($mode=='web'){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
-	else if($mode=='images'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li class="active">Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
-	else { echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li class="active">'.msg('Videos').'</li>';}
-?>	
-</nav>
-<aside>
+
+<aside class="<?php echo $noqueryclass;?>">
 	<?php if ($q_raw!=''){render_query(parse_query($q_raw,$start,$mode));} ?>
 </aside>
 
