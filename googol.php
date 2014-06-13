@@ -197,7 +197,9 @@
 	function parse_query($query,$start=0){
 		global $mode,$filtre;
 		if ($mode=='web'){ 
-			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).'&start='.$start.'&num=100',false);
+			if (!empty($filtre)){$f='&tbs='.$filtre;}else{$f='';}
+			//echo $query."<br>".$f; die();
+			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).$f.'&start='.$start.'&num=100',false);
 			if (stripos($page,CAPCHA_DETECT)!==false){
 				exit(msg('Google has received too mutch requests from this IP, try again later or with another version af googol.'));
 			}
@@ -293,7 +295,7 @@
 	}
 	function width($w,$h,$nh){return round(($nh*$w)/$h);}
 	function render_query($array){
-		global $start,$langue,$mode,$couleur,$taille;
+		global $start,$langue,$mode,$couleur,$taille,$temps;
 		if (!is_array($array)
 			||!isset($array['urlimg'])&&!isset($array['links'])
 			||isset($array['urlimg'])&&count($array['urlimg'])==0&&count($array['link']))
@@ -301,7 +303,7 @@
 		if ($mode=='web'){
 			echo '<ol start="'.$start.'">';
 			$nbresultsperpage=100;
-			$filtre='';
+			$filtre='&time='.$temps;
 			foreach ($array['links'] as $nb => $link){
 				if (ORANGE_PROXY_URL){$orange_proxy_link='<a class=" wot-exclude" title="proxy" href="'.proxyfie($link).'"> (proxy)</a>';}else{$orange_proxy_link='';}
 		
@@ -433,6 +435,7 @@
 	elseif (!empty($_GET['taille'])&&empty($_GET['couleur'])){$filtre=$taille=strip_tags($_GET['taille']);$couleur='';}
 	elseif (!empty($_GET['taille'])&&!empty($_GET['couleur'])){$taille=strip_tags($_GET['taille']);$couleur=strip_tags($_GET['couleur']);$filtre=$couleur.','.$taille;}
 	else{$filtre=$taille=$couleur='';}
+	if (isset($_GET['temps'])){$filtre=$temps=strip_tags($_GET['temps']);}else{$filtre=$temps='';}
 	if (isset($_GET['q'])){
 		handle_bangs($_GET['q']);
 		$q_raw=$_GET['q'];
@@ -489,6 +492,24 @@
 		<?php
 
 			if ($mode!=''){echo '<input type="hidden" name="mod" value="'.$mode.'"/>';}
+			if ($mode=='web'){
+				// ajout des options de recherche web
+				// temps
+				$times=array(
+					''=>msg('any time'),
+					'qdr:h'=>msg('Past hour'),
+					'qdr:d'=>msg('Past 24 hours'),
+					'qdr:w'=>msg('Past week'),
+					'qdr:m'=>msg('Past month'),
+					'qdr:y'=>msg('Past year'),
+				);
+				echo '<select id="time_selection" name="temps" class="'.$times[$temps].'" title="'.msg('any time').'">';
+				foreach ($times as $get=>$time){
+					if ($get==$temps){$sel=' selected ';}else{$sel='';}
+					echo '<option value="'.$get.'"'.$sel.'>'.$time.'</option>';
+				}
+				echo '</select>';
+			}
 			if ($mode=='images'){
 				// ajout des options de recherche d'images
 				// couleur
