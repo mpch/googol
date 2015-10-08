@@ -580,10 +580,10 @@
 	</p>
 				<nav>
 			<?php 
-				if ($mode=='web'){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li><li><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
-				else if($mode=='images'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li class="active">Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li><li><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
-				else if($mode=='news'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li>Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li><li class="active"><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
-				else { echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li class="active">'.msg('Videos').'</li><li><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
+				if ($mode=='web'){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}//<li><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
+				else if($mode=='images'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li class="active">Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}//<li><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
+				else if($mode=='news'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li>Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}//<li class="active"><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
+				else { echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li class="active">'.msg('Videos').'</li>';}//<li><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
 			?>	
 			</nav>		
 </header>
