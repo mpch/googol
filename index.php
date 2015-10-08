@@ -19,8 +19,8 @@
 	define('REGEX_PAGES','#&start=([0-9]+)|&start=([0-9]+)#');
 
 
-	define('REGEX_DATAIMG','#"data:image/jpeg;base64(?P<dataimg>.*?)"\]#');
-	define('REGEX_IMAGE','#imgurl=(?P<imgurl>.*?)&.*?imgrefurl=(?P<srcurl>.*?)&.*?h=(?P<h>.*?)&.*?w=(?P<w>.*?)&.*?<img data-s.*?="(?P<thmbsrc>.*?)".*?"fn":"(?P<imgfilename>.*?)".*?"os":"(?P<filesize>.*?)".*?"th":(?P<th>[0-9]+).*?"tw":(?P<tw>[0-9]+)#');
+	define('REGEX_DATAIMG','#\["(?P<id>.*?)","data:image\/jpeg;base64(?P<dataimg>.*?)"\]#');
+	define('REGEX_IMAGE','#imgurl=(?P<imgurl>.*?)&.*?imgrefurl=(?P<srcurl>.*?)&.*?h=(?P<h>.*?)&.*?w=(?P<w>.*?)&.*?tbnid=(?P<id>.*?)&.*?<img data-s.*?="(?P<thmbsrc>.*?)".*?"fn":"(?P<imgfilename>.*?)".*?"os":"(?P<filesize>.*?)".*?"th":(?P<th>[0-9]+).*?"tw":(?P<tw>[0-9]+)#');
 
 
 
@@ -58,6 +58,7 @@
 	define('URL','https://encrypted.google.com/search?hl='.LANGUAGE.SAFESEARCH_LEVEL.'&id=hp&q=');
 	define('URLIMG','&source=lnms&tbm=isch&biw=1920&bih=1075');
 	define('URLVID','&tbm=vid');
+	define('URLNEW','https://google.com/?gws_rd=ssl#q=#QUERY&tbm=nws');
 	define('VERSION','v1.7');
 	define('USE_GOOGLE_THUMBS',false);
 	define('THEME','style_google.css');
@@ -226,13 +227,17 @@
 			return $retour;
 		}elseif ($mode=='images'){ 			
 			if (!empty($filtre)){$f='&tbs='.$filtre;}else{$f='';}
-			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLIMG.$f.'&ei=zeA3U4vOOaW20wWOr4CoAw&page=3&start=22');
-
+			$page=file_get_contents('contenu.txt');//file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLIMG.$f.'&ei=zeA3U4vOOaW20wWOr4CoAw&page=3&start=22');
+			//file_put_contents('contenu.txt', $page);
 			if (!$page){return false;}			
 
 			preg_match_all(REGEX_DATAIMG,$page,$d);		// gets 19 first img in base64 format (thx google oO)	
 			preg_match_all(REGEX_IMAGE,$page,$r);		// gets all other data
-			
+			$data=array();
+			foreach ($d['id'] as $key=>$id){
+				$data[$id]=$d['dataimg'][$key];
+			}
+
 			$results=array();
 			foreach($r[2] as $key=>$item){
 				$results[$key]['urlimg']=$r['imgurl'][$key];
@@ -243,8 +248,9 @@
 				$results[$key]['w']=$r['w'][$key];
 				$results[$key]['th']=$r['th'][$key];
 				$results[$key]['tw']=$r['tw'][$key];
-				if (!empty($d['dataimg'][$key])){
-					$results[$key]['datatbm']=$d['dataimg'][$key];
+				$results[$key]['id']=$r['id'][$key];
+				if (!empty($data[$results[$key]['id']])){
+					$results[$key]['datatbm']=$data[$results[$key]['id']];
 				}else{
 					$results[$key]['urltmb']=$r['thmbsrc'][$key];
 				}
@@ -252,7 +258,7 @@
 			}
 			unset($r);
 			unset($d);
-
+			
 			$retour=array();$key=0;
 			foreach ($results as $id=>$result){
 				
@@ -269,6 +275,30 @@
 		}elseif($mode=="videos"){
 			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLVID.'&start='.$start,false);
 			
+			if (!$page){return false;}
+			preg_match_all(REGEX_VID,$page,$r);
+			preg_match_all(REGEX_PAGES,$page,$p);
+			$p=count($p[2]);
+			$retour=array(
+				'site'=>$r[5],
+				'titre'=>$r[4],
+				'links'=>array_map('urldecode', $r[3]),
+				'description'=>$r[6],
+				'thumbs'=>$r[1],
+				'thumbs_w'=>$r[2],
+				'nb_pages'=>$p,
+				'current_page'=>$start,
+				'query'=>$query,
+				'mode'=>$mode
+				);
+				
+			return $retour;		
+		}elseif($mode=="news"){
+			$q=str_replace(' ','+',urlencode($query));
+			$u=str_replace('#QUERY',$q,URLNEW).'&start='.$start;
+			
+			$page=file_curl_contents($u,false);
+			file_put_contents('contenu.txt',$page);
 			if (!$page){return false;}
 			preg_match_all(REGEX_VID,$page,$r);
 			preg_match_all(REGEX_PAGES,$page,$p);
@@ -545,21 +575,20 @@
 	<p class="msg nomobile <?php echo $noqueryclass;?>">
 		<?php 
 			echo msg('Search anonymously on Google (direct links, fake referer, no ads)'); 
-			if ($mode!='web'){	echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google…');	} 
+			if ($mode!='web'&&$mode!='news'){	echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google…');	} 
 		?> 
 	</p>
 				<nav>
 			<?php 
-				if ($mode=='web'){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
-				else if($mode=='images'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li class="active">Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
-				else { echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li class="active">'.msg('Videos').'</li>';}
+				if ($mode=='web'){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li><li><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
+				else if($mode=='images'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li class="active">Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li><li><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
+				else if($mode=='news'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li>Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li><li class="active"><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
+				else { echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li class="active">'.msg('Videos').'</li><li><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
 			?>	
 			</nav>		
 </header>
 
-<aside class="<?php echo $noqueryclass.' '.$mode;?>">
-	<?php if ($q_raw!=''){render_query(parse_query($q_raw,$start,$mode));} ?>
-</aside>
+<aside class="<?php echo $noqueryclass.' '.$mode;?>"><?php if ($q_raw!=''){render_query(parse_query($q_raw,$start,$mode));} ?></aside>
 <footer>
 	<span class="version"> <?php echo return_safe_search_level(); ?> </span>
 		

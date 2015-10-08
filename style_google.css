@@ -5,8 +5,21 @@
   src: local('Quicksand Bold'), local('Quicksand-Bold'), url(Quicksand_Regular.woff) format('woff');
 }
 		*{-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}
-		body{padding:0;margin:0;font-family:arial, sans-serif;min-width:320px;}
-		aside{padding:25px 25px 15px;border-top:1px solid #eee;}
+		html{
+		     height:100%;    
+		  }
+		body{
+			padding:0;margin:0;
+			font-family:arial, sans-serif;
+			min-width:320px;
+			min-height:100%;
+			position: relative;
+		}
+		aside{
+			padding:25px 25px 15px;
+			border-top:1px solid #eee;
+		}
+		aside:empty{background-color:white;}
 		body.images aside{text-align:center;}
 		a {text-decoration: none; }
 		hr{border:none;border-top:1px solid #eee;}
@@ -99,7 +112,14 @@
 		}
 		input[type=submit]:hover{background-color:#397be6;border-color:#286ad5 }
 		input[type=submit]:active{background-color:#4d90fe;border-color:transparent;border-top:2px solid transparent;}
-		
+		footer{
+			position: absolute;
+			bottom: 0px;
+			width:100%;
+		}
+
+
+
 		/*Web results*/
 		aside ul{padding:0; margin: 0;margin-left:40px;}
 		.o_p{height: 16px;width:16px;border-radius: 50%;background-color:orange;box-shadow: inset 0 0 2px maroon, 0 1px 1px maroon;display:inline-block;}
