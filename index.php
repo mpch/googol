@@ -227,8 +227,7 @@
 			return $retour;
 		}elseif ($mode=='images'){ 			
 			if (!empty($filtre)){$f='&tbs='.$filtre;}else{$f='';}
-			$page=file_get_contents('contenu.txt');//file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLIMG.$f.'&ei=zeA3U4vOOaW20wWOr4CoAw&page=3&start=22');
-			//file_put_contents('contenu.txt', $page);
+			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLIMG.$f.'&ei=zeA3U4vOOaW20wWOr4CoAw&page=3&start=22');
 			if (!$page){return false;}			
 
 			preg_match_all(REGEX_DATAIMG,$page,$d);		// gets 19 first img in base64 format (thx google oO)	
