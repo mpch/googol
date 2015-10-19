@@ -72,7 +72,7 @@
 	$lang['fr']=array(
 		'previous'=>strip_tags('Page précédente'),
 		'next'=>'Page suivante',
-		'Google has received too mutch requests from this IP, try again later or with another version af googol.'=>strip_tags('Google a reçu trop de requêtes de cette IP et la bloque: essaie plus tard !'),
+		'Google has received too many requests from this IP, try again later or with another version of googol.'=>strip_tags('Google a reçu trop de requêtes de cette IP et la bloque: essaie plus tard !'),
 		'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>strip_tags('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP…'),
 		'Search anonymously on Google (direct links, fake referer, no ads)'=>strip_tags('Rechercher anonymement sur Google (Pas de pubs, liens directs et referrer caché)'),
 		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>strip_tags('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)'),
@@ -107,9 +107,87 @@
 		'Medium'=>'Moyenne',
 		'Icon'=>'Petite',
 		);
+	$lang['pt']=array(
+		'previous'=>strip_tags('Página anterior'),
+		'next'=>'Próxima página',
+		'Google has received too many requests from this IP, try again later or with another version of googol.'=>strip_tags('Google recebeu mensagens demais vindo deste endereço de IP: tente usar outra versão do Googol!'),
+		'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>strip_tags('As miniaturas são salvas temporariamente em nosso servidor, para esconder o seu endereço de IP do Google…'),
+		'Search anonymously on Google (direct links, fake referer, no ads)'=>strip_tags('Busque anonimamente no Google (links diretos, referrer escondido, sem propaganda)'),
+		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>strip_tags('Livre e open source (favor manter um link para warriordudimanche.net para o autor ;)'),
+		'Googol - google without lies'=>'Googol - Google sem mentiras',
+		'on GitHub'=>'no GitHub',
+		'no results for'=>strip_tags('Nenhum resultado para '),
+		'by'=>'por',
+		'search '=>'buscar ',
+		'Videos'=>strip_tags('Vídeos'),
+		'Search'=>'Buscar',
+		'Otherwise, use a real Search engine !'=>'Senão, utilise uma ferramenta de busca de verdade!',
+		'Filter on'=>strip_tags('Filtro ativado'),
+		'Filter off'=>strip_tags('Filtro desativado'),
+		'Filter images only'=>strip_tags('Filtro ativado somente para imagens'),
+		'red'=>'vermelho',
+		'yellow'=>'amarelo',
+		'green'=>'verde',
+		'white'=>'branco',
+		'gray'=>'cinza',
+		'teal'=>'verde-azulado',
+		'black'=>'preto',
+		'pink'=>'rosa',
+		'blue'=>'azul',
+		'brown'=>'marrom',
+		'Black_and_white'=>'Branco_e_preto',
+		'Color'=>'cor',
+		'all colors'=>'todas as cores',
+		'all sizes'=>'todos os tamanhos',
+		'Select a color'=>'Filtrar por cor',
+		'Select a size'=>'Filtrar por tamanho',
+		'Big'=>'Grande',
+		'Medium'=>'Médio',
+		'Icon'=>'Pequeno',
+		);
+	$lang['nl']=array(
+		'previous'=>strip_tags('Vorige pagina'),
+		'next'=>'Volgende pagina',
+		'Google has received too many requests from this IP, try again later or with another version of googol.'=>strip_tags('Google heeft te veel verzoeken van dit IP-adres ontvangen. Probeer een andere versie van Googol!'),
+		'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>strip_tags('De miniatuurafbeldingen worden tijdelijk op onze server opgeslagen om uw IP-adres van Google te verbergen…'),
+		'Search anonymously on Google (direct links, fake referer, no ads)'=>strip_tags('Zoek anoniem op Google (Directe links, valse referrer en geen advertenties)'),
+		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>strip_tags('Vrij en open source, houd s.v.p. een link naar de auteur op warriordudimanche.net ;)'),
+		'Googol - google without lies'=>'Googol - Google zonder leugen',
+		'on GitHub'=>'op GitHub',
+		'no results for'=>strip_tags('geen resultaten voor '),
+		'by'=>'voor',
+		'search '=>'zoek ',
+		'Videos'=>strip_tags('Video\'s'),
+		'Search'=>'Zoeken',
+		'Otherwise, use a real Search engine !'=>'Anders, gebruik dan een echte zoekmachine!',
+		'Filter on'=>strip_tags('Filter activeren'),
+		'Filter off'=>strip_tags('Filter deactiveren'),
+		'Filter images only'=>strip_tags('Filter alleen voor plaatjes'),
+		'red'=>'rood',
+		'yellow'=>'geel',
+		'green'=>'groen',
+		'white'=>'wit',
+		'gray'=>'grijs',
+		'teal'=>'wintertaling',
+		'black'=>'zwart',
+		'pink'=>'roos',
+		'blue'=>'blauw',
+		'brown'=>'bruin',
+		'Black_and_white'=>'Zwart_en_wit',
+		'Color'=>'kleur',
+		'all colors'=>'alle kleuren',
+		'all sizes'=>'alle groottes',
+		'Select a color'=>'Filtreren per kleur',
+		'Select a size'=>'Filtreren per grootte',
+		'Big'=>'Grande',
+		'Medium'=>'Medium',
+		'Icon'=>'Icoontjes',
+		);
 	$bangs=array(
 		'!ddg'=>'https://duckduckgo.com/?q=',
-		'!gi'=>'https://www.google.fr/search?hl=fr&tbm=isch&biw=6366&bih=6628&q=',
+		'!gi'=>'https://www.google.com/search?tbm=isch&q=', // redirects to country website
+		'!g'=>'https://www.google.com/search?q=', // redirects to country website
+		'!w'=>'https://wikipedia.org/wiki/', // redirects to country website
 		);
 
 
@@ -207,7 +285,7 @@
 		if ($mode=='web'){ 
 			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).'&start='.$start.'&num=100',false);
 			if (stripos($page,CAPCHA_DETECT)!==false){
-				exit(msg('Google has received too mutch requests from this IP, try again later or with another version af googol.'));
+				exit(msg('Google has received too many requests from this IP, try again later or with another version of googol.'));
 			}
 			if (!$page){return false;}
 			preg_match_all(REGEX_WEB, $page, $r);
@@ -500,6 +578,8 @@
 			<div class="lang">
 				<a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> 
 				<a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a>
+				<a class="<?php is_active(LANGUAGE,'pt'); ?>" href="?lang=pt">PT</a>
+				<a class="<?php is_active(LANGUAGE,'nl'); ?>" href="?lang=nl">NL</a>
 			</div><div style="clear:both;"></div>
 
 		</div>
