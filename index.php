@@ -72,7 +72,7 @@
 	$lang['fr']=array(
 		'previous'=>strip_tags('Page précédente'),
 		'next'=>'Page suivante',
-		'Google has received too mutch requests from this IP, try again later or with another version of googol.'=>strip_tags('Google a reçu trop de requêtes de cette IP et la bloque: essaie plus tard !'),
+		'Google has received too many requests from this IP, try again later or with another version of googol.'=>strip_tags('Google a reçu trop de requêtes de cette IP et la bloque: essaie plus tard !'),
 		'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>strip_tags('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP…'),
 		'Search anonymously on Google (direct links, fake referer, no ads)'=>strip_tags('Rechercher anonymement sur Google (Pas de pubs, liens directs et referrer caché)'),
 		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>strip_tags('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)'),
@@ -110,7 +110,7 @@
 	$lang['pt']=array(
 		'previous'=>strip_tags('Página anterior'),
 		'next'=>'Próxima página',
-		'Google has received too mutch requests from this IP, try again later or with another version of googol.'=>strip_tags('Google recebeu mensagens demais vindo deste endereço de IP: tente usar outra versão do Googol!'),
+		'Google has received too many requests from this IP, try again later or with another version of googol.'=>strip_tags('Google recebeu mensagens demais vindo deste endereço de IP: tente usar outra versão do Googol!'),
 		'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>strip_tags('As miniaturas são salvas temporariamente em nosso servidor, para esconder o seu endereço de IP do Google…'),
 		'Search anonymously on Google (direct links, fake referer, no ads)'=>strip_tags('Busque anonimamente no Google (links diretos, referrer escondido, sem propaganda)'),
 		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>strip_tags('Livre e open source (favor manter um link para warriordudimanche.net para o autor ;)'),
@@ -148,7 +148,7 @@
 	$lang['nl']=array(
 		'previous'=>strip_tags('Vorige pagina'),
 		'next'=>'Volgende pagina',
-		'Google has received too mutch requests from this IP, try again later or with another version of googol.'=>strip_tags('Google heeft te veel verzoeken van dit IP-adres ontvangen. Probeer een andere versie van Googol!'),
+		'Google has received too many requests from this IP, try again later or with another version of googol.'=>strip_tags('Google heeft te veel verzoeken van dit IP-adres ontvangen. Probeer een andere versie van Googol!'),
 		'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>strip_tags('De miniatuurafbeldingen worden tijdelijk op onze server opgeslagen om uw IP-adres van Google te verbergen…'),
 		'Search anonymously on Google (direct links, fake referer, no ads)'=>strip_tags('Zoek anoniem op Google (Directe links, valse referrer en geen advertenties)'),
 		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>strip_tags('Vrij en open source, houd s.v.p. een link naar de auteur op warriordudimanche.net ;)'),
@@ -285,7 +285,7 @@
 		if ($mode=='web'){ 
 			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).'&start='.$start.'&num=100',false);
 			if (stripos($page,CAPCHA_DETECT)!==false){
-				exit(msg('Google has received too mutch requests from this IP, try again later or with another version of googol.'));
+				exit(msg('Google has received too many requests from this IP, try again later or with another version of googol.'));
 			}
 			if (!$page){return false;}
 			preg_match_all(REGEX_WEB, $page, $r);
