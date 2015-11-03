@@ -1,16 +1,9 @@
 <?php 
-	// Sometimes, htmlspecialchars seems to return empty strings for unknown reasons (for me), this supposedly does exactly the same as htmlspecialchars (with default args) but always returns something.
-	function my_htmlspecialchars($str) {
-		return str_replace(
-			array('&', '<', '>', '"'),
-			array('&amp;', '&lt;', '&gt;', '&quot;'),
-			$str
-		);
-	}
 
 	if (isset($_GET['lang'])){$langue=strip_tags($_GET['lang']);}else{$langue=strip_tags(lang());}
 	clear_cache();// vire les thumbs de plus de trois minutes
 	define('LANGUAGE',$langue);
+	define('PAUSE_DURATION',60); // minutes
 	define('RACINE','http://'.$_SERVER['SERVER_NAME']);
 	define('USE_WEB_OF_TRUST',true);
 	define('ORANGE_PROXY_URL','');
@@ -18,11 +11,8 @@
 	define('REGEX_WEB','#(?<=<h3 class="r"><a href="/url\?q=)([^&]+).*?>(.*?)</a>.*?(?<=<span class="st">)(.*?)(?=</span>)#s');
 	define('REGEX_PAGES','#&start=([0-9]+)|&start=([0-9]+)#');
 
-
 	define('REGEX_DATAIMG','#\["(?P<id>.*?)","data:image\/jpeg;base64(?P<dataimg>.*?)"\]#');
 	define('REGEX_IMAGE','#imgurl=(?P<imgurl>.*?)&.*?imgrefurl=(?P<srcurl>.*?)&.*?h=(?P<h>.*?)&.*?w=(?P<w>.*?)&.*?tbnid=(?P<id>.*?)&.*?<img data-s.*?="(?P<thmbsrc>.*?)".*?"fn":"(?P<imgfilename>.*?)".*?"os":"(?P<filesize>.*?)".*?"th":(?P<th>[0-9]+).*?"tw":(?P<tw>[0-9]+)#');
-
-
 
 	define('REGEX_VID','#(?:<img.*?src="([^"]+)".*?width="([0-9]+)".*?)?<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&|&).*?">(.*?)</a>.*?<cite[^>]*>(.*?)</cite>.*?<span class="(?:st|f)">(.*?)(?:</span></td>|</span><br></?div>)#');
 	define('REGEX_VID_THMBS','#<img.*?src="([^"]+)".*?width="([0-9]+)"#');
@@ -49,7 +39,7 @@
 	define('TPLVID','<div class="video" ><h3><a rel="noreferrer" href="#link" title="#link">#titre</a></h3><a class="thumb" rel="noreferrer" href="#link" title="#link">#thumbs</a><p class="site">#site</p><p class="description">#description</p></div>');
 	define('LOGO1','<a href="'.RACINE.'"><em class="g">G</em><em class="o1">o</em>');
 	define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="l">l</em></a>');
-	define('CAPCHA_DETECT','<form action="Captcha" method="get"><input type="hidden" name="continue"');
+	define('CAPCHA_DETECT','Our systems have detected unusual traffic from your computer network.');
 	define('SAFESEARCH_ON','&safe=on');
 	define('SAFESEARCH_IMAGESONLY','&safe=images');
 	define('SAFESEARCH_OFF','&safe=off');
@@ -58,10 +48,16 @@
 	define('URL','https://encrypted.google.com/search?hl='.LANGUAGE.SAFESEARCH_LEVEL.'&id=hp&q=');
 	define('URLIMG','&source=lnms&tbm=isch&biw=1920&bih=1075');
 	define('URLVID','&tbm=vid');
-	define('URLNEW','https://google.com/?gws_rd=ssl#q=#QUERY&tbm=nws');
-	define('VERSION','v1.7');
+	define('VERSION','v1.71');
 	define('USE_GOOGLE_THUMBS',false);
 	define('THEME','style_google.css');
+
+	/* try to re send captcha to google */
+	if (!empty($_GET['captcha'])){
+		exit('location: '.$bangs['!ddg'].$query);//post_data('https://google.fr',$_POST));
+	}
+
+
 
 	if (!USE_GOOGLE_THUMBS){ 
 		session_start();
@@ -72,7 +68,7 @@
 	$lang['fr']=array(
 		'previous'=>strip_tags('Page précédente'),
 		'next'=>'Page suivante',
-		'Google has received too many requests from this IP, try again later or with another version of googol.'=>strip_tags('Google a reçu trop de requêtes de cette IP et la bloque: essaie plus tard !'),
+		'Google has received too mutch requests from this IP, try again later or with another version af googol.'=>strip_tags('Google a reçu trop de requêtes de cette IP et la bloque: essaie plus tard !'),
 		'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>strip_tags('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP…'),
 		'Search anonymously on Google (direct links, fake referer, no ads)'=>strip_tags('Rechercher anonymement sur Google (Pas de pubs, liens directs et referrer caché)'),
 		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>strip_tags('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)'),
@@ -107,87 +103,9 @@
 		'Medium'=>'Moyenne',
 		'Icon'=>'Petite',
 		);
-	$lang['pt']=array(
-		'previous'=>strip_tags('Página anterior'),
-		'next'=>'Próxima página',
-		'Google has received too many requests from this IP, try again later or with another version of googol.'=>strip_tags('Google recebeu mensagens demais vindo deste endereço de IP: tente usar outra versão do Googol!'),
-		'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>strip_tags('As miniaturas são salvas temporariamente em nosso servidor, para esconder o seu endereço de IP do Google…'),
-		'Search anonymously on Google (direct links, fake referer, no ads)'=>strip_tags('Busque anonimamente no Google (links diretos, referrer escondido, sem propaganda)'),
-		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>strip_tags('Livre e open source (favor manter um link para warriordudimanche.net para o autor ;)'),
-		'Googol - google without lies'=>'Googol - Google sem mentiras',
-		'on GitHub'=>'no GitHub',
-		'no results for'=>strip_tags('Nenhum resultado para '),
-		'by'=>'por',
-		'search '=>'buscar ',
-		'Videos'=>strip_tags('Vídeos'),
-		'Search'=>'Buscar',
-		'Otherwise, use a real Search engine !'=>'Senão, utilise uma ferramenta de busca de verdade!',
-		'Filter on'=>strip_tags('Filtro ativado'),
-		'Filter off'=>strip_tags('Filtro desativado'),
-		'Filter images only'=>strip_tags('Filtro ativado somente para imagens'),
-		'red'=>'vermelho',
-		'yellow'=>'amarelo',
-		'green'=>'verde',
-		'white'=>'branco',
-		'gray'=>'cinza',
-		'teal'=>'verde-azulado',
-		'black'=>'preto',
-		'pink'=>'rosa',
-		'blue'=>'azul',
-		'brown'=>'marrom',
-		'Black_and_white'=>'Branco_e_preto',
-		'Color'=>'cor',
-		'all colors'=>'todas as cores',
-		'all sizes'=>'todos os tamanhos',
-		'Select a color'=>'Filtrar por cor',
-		'Select a size'=>'Filtrar por tamanho',
-		'Big'=>'Grande',
-		'Medium'=>'Médio',
-		'Icon'=>'Pequeno',
-		);
-	$lang['nl']=array(
-		'previous'=>strip_tags('Vorige pagina'),
-		'next'=>'Volgende pagina',
-		'Google has received too many requests from this IP, try again later or with another version of googol.'=>strip_tags('Google heeft te veel verzoeken van dit IP-adres ontvangen. Probeer een andere versie van Googol!'),
-		'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>strip_tags('De miniatuurafbeldingen worden tijdelijk op onze server opgeslagen om uw IP-adres van Google te verbergen…'),
-		'Search anonymously on Google (direct links, fake referer, no ads)'=>strip_tags('Zoek anoniem op Google (Directe links, valse referrer en geen advertenties)'),
-		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>strip_tags('Vrij en open source, houd s.v.p. een link naar de auteur op warriordudimanche.net ;)'),
-		'Googol - google without lies'=>'Googol - Google zonder leugen',
-		'on GitHub'=>'op GitHub',
-		'no results for'=>strip_tags('geen resultaten voor '),
-		'by'=>'voor',
-		'search '=>'zoek ',
-		'Videos'=>strip_tags('Video\'s'),
-		'Search'=>'Zoeken',
-		'Otherwise, use a real Search engine !'=>'Anders, gebruik dan een echte zoekmachine!',
-		'Filter on'=>strip_tags('Filter activeren'),
-		'Filter off'=>strip_tags('Filter deactiveren'),
-		'Filter images only'=>strip_tags('Filter alleen voor plaatjes'),
-		'red'=>'rood',
-		'yellow'=>'geel',
-		'green'=>'groen',
-		'white'=>'wit',
-		'gray'=>'grijs',
-		'teal'=>'wintertaling',
-		'black'=>'zwart',
-		'pink'=>'roos',
-		'blue'=>'blauw',
-		'brown'=>'bruin',
-		'Black_and_white'=>'Zwart_en_wit',
-		'Color'=>'kleur',
-		'all colors'=>'alle kleuren',
-		'all sizes'=>'alle groottes',
-		'Select a color'=>'Filtreren per kleur',
-		'Select a size'=>'Filtreren per grootte',
-		'Big'=>'Grande',
-		'Medium'=>'Medium',
-		'Icon'=>'Icoontjes',
-		);
 	$bangs=array(
 		'!ddg'=>'https://duckduckgo.com/?q=',
-		'!gi'=>'https://www.google.com/search?tbm=isch&q=', // redirects to country website
-		'!g'=>'https://www.google.com/search?q=', // redirects to country website
-		'!w'=>'https://wikipedia.org/wiki/', // redirects to country website
+		'!gi'=>'https://www.google.fr/search?hl=fr&tbm=isch&biw=6366&bih=6628&q=',
 		);
 
 
@@ -195,7 +113,20 @@
 	## Fonctions
 	#######################################################################
 	function aff($a,$stop=true,$line=0){echo 'Arret a la ligne '.$line.' du fichier '.__FILE__.'<pre style="text-align:left">';var_dump($a);echo '</pre>';if ($stop){exit();}}
-	
+	function my_htmlspecialchars($str) {
+		return str_replace(
+			array('&', '<', '>', '"'),
+			array('&amp;', '&lt;', '&gt;', '&quot;'),
+			$str
+		);
+	}
+
+	function start_pause(){file_put_contents('INACTIVE.ini',date('U'));}
+	function still_pause(){
+		$since=intval(file_get_contents('INACTIVE.ini'));
+		//echo 'depuis '.$since.'// pendant '.PAUSE_DURATION.' min// il est '.date('U').'// jusqua '.($since+(PAUSE_DURATION*60));
+		return $since+(PAUSE_DURATION*60)>date('U');
+	}
 	function proxyfie($str){
 		// returns a modified url: complete with ORANGE_PROXY if not empty and
 		// hides the url
@@ -284,8 +215,12 @@
 		global $mode,$filtre;
 		if ($mode=='web'){ 
 			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).'&start='.$start.'&num=100',false);
+
+
 			if (stripos($page,CAPCHA_DETECT)!==false){
-				exit(msg('Google has received too many requests from this IP, try again later or with another version of googol.'));
+				start_pause();
+				global $bangs;header('location: '.$bangs['!ddg'].$query);
+				exit();
 			}
 			if (!$page){return false;}
 			preg_match_all(REGEX_WEB, $page, $r);
@@ -351,31 +286,11 @@
 			return $retour;		
 		}elseif($mode=="videos"){
 			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLVID.'&start='.$start,false);
-			
-			if (!$page){return false;}
-			preg_match_all(REGEX_VID,$page,$r);
-			preg_match_all(REGEX_PAGES,$page,$p);
-			$p=count($p[2]);
-			$retour=array(
-				'site'=>$r[5],
-				'titre'=>$r[4],
-				'links'=>array_map('urldecode', $r[3]),
-				'description'=>$r[6],
-				'thumbs'=>$r[1],
-				'thumbs_w'=>$r[2],
-				'nb_pages'=>$p,
-				'current_page'=>$start,
-				'query'=>$query,
-				'mode'=>$mode
-				);
-				
-			return $retour;		
-		}elseif($mode=="news"){
-			$q=str_replace(' ','+',urlencode($query));
-			$u=str_replace('#QUERY',$q,URLNEW).'&start='.$start;
-			
-			$page=file_curl_contents($u,false);
-			file_put_contents('contenu.txt',$page);
+			if (stripos($page,CAPCHA_DETECT)!==false){
+				start_pause();
+				global $bangs;header('location: '.$bangs['!ddg'].$query);
+				exit();
+			}
 			if (!$page){return false;}
 			preg_match_all(REGEX_VID,$page,$r);
 			preg_match_all(REGEX_PAGES,$page,$p);
@@ -541,6 +456,7 @@
 	elseif (!empty($_GET['taille'])&&!empty($_GET['couleur'])){$taille=strip_tags($_GET['taille']);$couleur=strip_tags($_GET['couleur']);$filtre=$couleur.','.$taille;}
 	else{$filtre=$taille=$couleur='';}
 	if (isset($_GET['q'])){
+		if (still_pause()){header('location: '.$bangs['!ddg'].strip_tags($_GET['q']));exit();}
 		handle_bangs($_GET['q']);
 		$q_raw=$_GET['q'];
 		$q_txt=strip_tags($_GET['q']);
@@ -578,8 +494,6 @@
 			<div class="lang">
 				<a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> 
 				<a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a>
-				<a class="<?php is_active(LANGUAGE,'pt'); ?>" href="?lang=pt">PT</a>
-				<a class="<?php is_active(LANGUAGE,'nl'); ?>" href="?lang=nl">NL</a>
 			</div><div style="clear:both;"></div>
 
 		</div>
@@ -654,20 +568,21 @@
 	<p class="msg nomobile <?php echo $noqueryclass;?>">
 		<?php 
 			echo msg('Search anonymously on Google (direct links, fake referer, no ads)'); 
-			if ($mode!='web'&&$mode!='news'){	echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google…');	} 
+			if ($mode!='web'){	echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google…');	} 
 		?> 
 	</p>
 				<nav>
 			<?php 
-				if ($mode=='web'){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}//<li><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
-				else if($mode=='images'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li class="active">Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}//<li><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
-				else if($mode=='news'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li>Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}//<li class="active"><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
-				else { echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li class="active">'.msg('Videos').'</li>';}//<li><a href="?q='.urlencode($q_raw).'&mod=news&lang='.$langue.'">'.msg('News').'</a>';}
+				if ($mode=='web'){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
+				else if($mode=='images'){echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li class="active">Images</li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
+				else { echo '<li><a href="?q='.urlencode($q_raw).'&lang='.$langue.'">Web</a></li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li class="active">'.msg('Videos').'</li>';}
 			?>	
 			</nav>		
 </header>
 
-<aside class="<?php echo $noqueryclass.' '.$mode;?>"><?php if ($q_raw!=''){render_query(parse_query($q_raw,$start,$mode));} ?></aside>
+<aside class="<?php echo $noqueryclass.' '.$mode;?>">
+	<?php if ($q_raw!=''){render_query(parse_query($q_raw,$start,$mode));} ?>
+</aside>
 <footer>
 	<span class="version"> <?php echo return_safe_search_level(); ?> </span>
 		

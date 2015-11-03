@@ -235,6 +235,7 @@
 		}
 		@media screen and (max-width: 670px){
 			.video{width:100%;}
+			.web .result {width:100%;}
 		}
 		@media screen and (max-width: 480px){
 			.logo{display:block!important;text-align: center;}
@@ -247,6 +248,7 @@
 
 			div.image{width:100%;}
 			div.image img{width:100%!important;height:auto!important;}
+			.web .result {width:100%;}
 		}
 		/* transitions*/
 		.images img,.image img:hover{-webkit-transition:all 100ms ;-moz-transition:all 100ms ;-o-transition:all 100ms ;transition:all 100ms ;}
