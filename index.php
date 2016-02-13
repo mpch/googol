@@ -123,7 +123,9 @@
 
 	function start_pause(){file_put_contents('INACTIVE.ini',date('U'));}
 	function still_pause(){
-		$since=intval(file_get_contents('INACTIVE.ini'));
+		if (is_file('INACTIVE.ini')){
+			$since=intval(file_get_contents('INACTIVE.ini'));
+		}else{$since=0;}
 		//echo 'depuis '.$since.'// pendant '.PAUSE_DURATION.' min// il est '.date('U').'// jusqua '.($since+(PAUSE_DURATION*60));
 		return $since+(PAUSE_DURATION*60)>date('U');
 	}
