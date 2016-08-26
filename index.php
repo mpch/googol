@@ -1,10 +1,10 @@
 <?php 
-
+	session_start();
 	if (isset($_GET['lang'])){$langue=strip_tags($_GET['lang']);}else{$langue=strip_tags(lang());}
 	clear_cache();// vire les thumbs de plus de trois minutes
 	define('LANGUAGE',$langue);
 	define('PAUSE_DURATION',60); // minutes
-	define('RACINE','http://'.$_SERVER['SERVER_NAME']);
+	define('RACINE',getRacine());
 	define('USE_WEB_OF_TRUST',true);
 	define('ORANGE_PROXY_URL','');
 	define('WOT_URL','http://www.mywot.com/scorecard/');
@@ -12,31 +12,16 @@
 	define('REGEX_PAGES','#&start=([0-9]+)|&start=([0-9]+)#');
 
 	define('REGEX_DATAIMG','#\["(?P<id>.*?)","data:image\/jpeg;base64(?P<dataimg>.*?)"\]#');
-	define('REGEX_IMAGE','#imgurl=(?P<imgurl>.*?)&.*?imgrefurl=(?P<srcurl>.*?)&.*?h=(?P<h>.*?)&.*?w=(?P<w>.*?)&.*?tbnid=(?P<id>.*?)&.*?<img data-s.*?="(?P<thmbsrc>.*?)".*?"fn":"(?P<imgfilename>.*?)".*?"os":"(?P<filesize>.*?)".*?"th":(?P<th>[0-9]+).*?"tw":(?P<tw>[0-9]+)#');
-
+	define('REGEX_IMAGE','#style="background:(?P<color>rgb\([0-9]{1,3},[0-9]{1,3},[0-9]{1,3}\))".*?"id":"(?P<id>.*?)".*?"isu":"(?P<site>.*?)".*?"oh":(?P<h>[0-9]+).*?"ou":"(?P<imgurl>.*?)".*?"ow":(?P<w>[0-9]+).*?"ru":"(?P<srcurl>.*?)".*?"th":(?P<th>[0-9]+).*?"tu":"(?P<thmbsrc>.*?)".*?"tw":(?P<tw>[0-9]+)#');
 	define('REGEX_VID','#(?:<img.*?src="([^"]+)".*?width="([0-9]+)".*?)?<h3 class="r">[^<]*<a href="/url\?q=(.*?)(?:&|&).*?">(.*?)</a>.*?<cite[^>]*>(.*?)</cite>.*?<span class="(?:st|f)">(.*?)(?:</span></td>|</span><br></?div>)#');
 	define('REGEX_VID_THMBS','#<img.*?src="([^"]+)".*?width="([0-9]+)"#');
-	
-	// old regexes (just in case)
-	/*
-	define('REGEX_IMG','#(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)|(?<=imgurl=)(.*?)&imgrefurl=(.*?)&.*?h=([0-9]+)&w=([0-9]+)&sz=([0-9]+)#s');
-	define('REGEX_THMBS','#<img.*?height="([0-9]+)".*?src="([^"]+)".*?width="([0-9]+)"#s');
-	define('REGEX_IMGTHUMBS','#imgrefurl=([^&]+).*?imgurl=([^&]+).*?w=([0-9]+).*?h=([0-9]+).*?"th":([0-9]+).*?"tu":"(https://[^"]+).*?"tw":([0-9]+)#');
-	define('REGEX_DATAIMG',"#\{e\.src='(data:image[^']+).*?ByName\('(.*?)'#");
-	define('REGEX_IMGTHUMBS','#imgurl=(.*?)&.*?imgrefurl=(.*?)&.*?h=([0-9]+).*?w=([0-9]+).*?tbnid=(.*?)&#');
-	define('REGEX_DATAIMG',"#\{e\.src='(data:image[^']+).*?ByName\('(.*?)'#");
-	define('REGEX_IMG','#<div class="rg_di.*?<img class="rg_i" src="([^"]+).*?"tw":([0-9]+), ?"th":([0-9]+).*?imgrefurl=(.*?)&.*?h=#');
-	define('REGEX_IMG1','#<div class="rg_di.*?href=".*?imgurl=([^&]+).*?imgrefurl=([^&]+).*?h=([0-9]+).*?w=([0-9]+).*?tbnid=([^&]+).*?"th":([0-9]+).*?"tw":([0-9]+)#');
-	define('REGEX_IMG2','#<img.*?data-src="([^"]+).*?name="([^"]+)#');
-	define('REGEX_IMG3','#<img.*?class="rg_i.*?src="([^"]+).*?<div class="rg_meta.*?tbnid=([^&]+)#');
-	define('REGEX_IMG4',"#\{e\.src='([^']+).*?\('([^']+)#");
-	define('REGEX_IMAGE','#"rg_di rg_el ivg-i".*?href="[^\?]*?\?imgurl=([^&]*?).*?imgrefurl=([^&]*?).*?img data-src="([^"]*?).*?<span class="rg_ilmn">([^\<]*?)#');
-	
-	*/
+
 
 	define('TPL','<li class="result"><a rel="noreferrer" href="#link"><h3 class="title">#title</h3>#link</a>#wot<p class="description">#description</p></li>');
-	define('TPLIMG','<div class="image" ><p><a rel="noreferrer" href="#link" title="#link">#thumbs</a></p><p class="description">#W x #H #proxylink #size<a class="source" href="#site" title="#site"> &#9658;</a></p></div>');
+	define('TPLIMG','<div class="image"><div><a rel="noreferrer" href="#link" title="#link">#thumbs</a></div><div class="description">#W x #H #proxylink <a class="source" href="#url" title="#url"> #site</a></div></div>');
 	define('TPLVID','<div class="video" ><h3><a rel="noreferrer" href="#link" title="#link">#titre</a></h3><a class="thumb" rel="noreferrer" href="#link" title="#link">#thumbs</a><p class="site">#site</p><p class="description">#description</p></div>');
+
+
 	define('LOGO1','<a href="'.RACINE.'"><em class="g">G</em><em class="o1">o</em>');
 	define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="l">l</em></a>');
 	define('CAPCHA_DETECT','Our systems have detected unusual traffic from your computer network.');
@@ -45,16 +30,15 @@
 	define('SAFESEARCH_OFF','&safe=off');
 	define('SAFESEARCH_LEVEL',SAFESEARCH_OFF);// SAFESEARCH_ON, SAFESEARCH_IMAGESONLY, SAFESEARCH_OFF
 
-	define('URL','https://encrypted.google.com/search?hl='.LANGUAGE.SAFESEARCH_LEVEL.'&id=hp&q=');
-	define('URLIMG','&source=lnms&tbm=isch&biw=1920&bih=1075');
+	define('URL','https://encrypted.google.com/search?hl='.LANGUAGE.SAFESEARCH_LEVEL.'&id=hp&q=');	
+	define('URLIMG','https://www.google.com/search?async=_id:rg_s,_pms:qs&hl='.LANGUAGE.SAFESEARCH_LEVEL.'&asearch=ichunk&id=hp&tbm=isch&q=');
 	define('URLVID','&tbm=vid');
-	define('VERSION','v1.71');
-	define('USE_GOOGLE_THUMBS',false);
+	define('VERSION','v1.8');
+	define('USE_GOOGLE_THUMBS',true);
 	define('THEME','style_google.css');
 
-	/* try to re send captcha to google */
 	if (!empty($_GET['captcha'])){
-		exit('location: '.$bangs['!ddg'].$query);//post_data('https://google.fr',$_POST));
+		exit('location: '.$bangs['!ddg'].$query);
 	}
 
 
@@ -102,10 +86,13 @@
 		'Big'=>'Grande',
 		'Medium'=>'Moyenne',
 		'Icon'=>'Petite',
+		'load more'=>'charger davantage',
 		);
 	$bangs=array(
 		'!ddg'=>'https://duckduckgo.com/?q=',
 		'!gi'=>'https://www.google.fr/search?hl=fr&tbm=isch&biw=6366&bih=6628&q=',
+		'!q'=>'https://www.qwant.com/?q=',
+		'!qi'=>'https://www.qwant.com/?t=images&q=',
 		);
 
 
@@ -120,7 +107,35 @@
 			$str
 		);
 	}
-
+	function protocolIsHTTPS() {
+	    return (!empty($_SERVER['HTTPS']) AND $_SERVER['HTTPS'] == 'on') ? true : false;
+	}
+	function checkSite(&$site, $reset=true) {
+	    $site = preg_replace('#([\'"].*)#', '', $site);
+	    # Méthode Jeffrey Friedl - http://mathiasbynens.be/demo/url-regex
+	    # modifiée par Amaury Graillat pour prendre en compte la valeur localhost dans l'url
+	    if(preg_match('@\b((ftp|https?)://([-\w]+(\.\w[-\w]*)+|localhost)|(?:[a-z0-9](?:[-a-z0-9]*[a-z0-9])?\.)+(?: com\b|edu\b|biz\b|gov\b|in(?:t|fo)\b|mil\b|net\b|org\b|[a-z][a-z]\b))(\:\d+)?(/[^.!,?;"\'<>()\[\]{}\s\x7F-\xFF]*(?:[.!,?]+[^.!,?;"\'<>()\[\]{}\s\x7F-\xFF]+)*)?@iS', $site))
+	            return true;
+	    else {
+	        if($reset) $site='';
+	        return false;
+	    }
+	}
+	function getRacine($truncate=false) {
+	    $protocol = protocolIsHTTPS() ? 'https://' : "http://";
+	    $servername = $_SERVER['HTTP_HOST'];
+	    $serverport = (preg_match('/:[0-9]+/', $servername) OR $_SERVER['SERVER_PORT'])=='80' ? '' : ':'.$_SERVER['SERVER_PORT'];
+	    $dirname = preg_replace('/\/(core|plugins)\/(.*)/', '', dirname($_SERVER['SCRIPT_NAME']));
+	    $racine = rtrim($protocol.$servername.$serverport.$dirname, '/').'/';
+	    $racine = str_replace(array('webroot/','install/'), '', $racine);
+	    if(!checkSite($racine, false))
+	        die('Error: wrong or invalid url');
+	    if ($truncate){ 
+	        $root = substr($racine,strpos($racine, '://')+3,strpos($racine,basename($racine))+4);
+	        $racine = substr($root,strpos($root,'/'));
+	    }
+	    return $racine;
+	}
 	function start_pause(){file_put_contents('INACTIVE.ini',date('U'));}
 	function still_pause(){
 		if (is_file('INACTIVE.ini')){
@@ -181,7 +196,7 @@
 		curl_setopt($ch, CURLOPT_URL, $url);
 		if (!ini_get("safe_mode") && !ini_get('open_basedir') ) {curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);}
 		curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
-		if ($pretend){curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:19.0) Gecko/20100101 Firefox/19.0');}
+		if ($pretend){curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Linux; Android 4.4.2; Che2-L11 Build/HonorChe2-L11) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36');}
     
 		curl_setopt($ch, CURLOPT_REFERER, random_referer());// notez le referer "custom"
 
@@ -242,27 +257,31 @@
 			return $retour;
 		}elseif ($mode=='images'){ 			
 			if (!empty($filtre)){$f='&tbs='.$filtre;}else{$f='';}
-			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).URLIMG.$f.'&ei=zeA3U4vOOaW20wWOr4CoAw&page=3&start=22');
-			if (!$page){return false;}			
+			if (empty($start)){$start=0;}
+			$page=file_curl_contents(URLIMG.str_replace(' ','+',urlencode($query)).$f.'&start='.(100*$start).'&ijn='.$start);
+			if (!$page){return false;}		
+			$page=str_ireplace(array('\u003c','\u003e','\u003d'),array('<','>','='),stripslashes($page));
 
-			preg_match_all(REGEX_DATAIMG,$page,$d);		// gets 19 first img in base64 format (thx google oO)	
+			//preg_match_all(REGEX_DATAIMG,$page,$d);		// gets 19 first img in base64 format (thx google oO)	
 			preg_match_all(REGEX_IMAGE,$page,$r);		// gets all other data
+			/*
 			$data=array();
 			foreach ($d['id'] as $key=>$id){
 				$data[$id]=$d['dataimg'][$key];
 			}
-
+*/
 			$results=array();
 			foreach($r[2] as $key=>$item){
 				$results[$key]['urlimg']=$r['imgurl'][$key];
 				$results[$key]['urlpage']=$r['srcurl'][$key];
-				$results[$key]['imgfilename']=$r['imgfilename'][$key];
-				$results[$key]['filesize']=$r['filesize'][$key];
+				$results[$key]['imgfilename']=basename($r['imgurl'][$key]);
+				$results[$key]['color']=$r['color'][$key];
 				$results[$key]['h']=$r['h'][$key];
 				$results[$key]['w']=$r['w'][$key];
 				$results[$key]['th']=$r['th'][$key];
 				$results[$key]['tw']=$r['tw'][$key];
 				$results[$key]['id']=$r['id'][$key];
+				$results[$key]['site']=$r['site'][$key];
 				if (!empty($data[$results[$key]['id']])){
 					$results[$key]['datatbm']=$data[$results[$key]['id']];
 				}else{
@@ -271,8 +290,7 @@
 				
 			}
 			unset($r);
-			unset($d);
-			
+			//unset($d);
 			$retour=array();$key=0;
 			foreach ($results as $id=>$result){
 				
@@ -344,7 +362,10 @@
 		}elseif ($mode=='images'){
 			$nbresultsperpage=20;
 			$filtre='&couleur='.$couleur.'&taille='.$taille;
-			$common_height=min($array['tw']);
+			if (empty($_SESSION['common_height'])){
+				$_SESSION['common_height']=(max($array['tw'])+min($array['tw']))/2;
+			}
+			
 			
 			foreach ($array['urlimg'] as $nb => $link){
 				if (ORANGE_PROXY_URL){$orange_proxy_link='<a class="o_p wot-exclude" title="proxy" href="'.proxyfie($link).'">&nbsp;</a>';}else{$orange_proxy_link='';}
@@ -353,22 +374,27 @@
 				$r=str_replace('#proxylink',$orange_proxy_link,$r);
 				$r=str_replace('#H',$array['h'][$nb],$r);
 				$r=str_replace('#W',$array['w'][$nb],$r);
-				$r=str_replace('#site',$array['urlpage'][$nb],$r);
-				$r=str_replace('#size',$array['filesize'][$nb],$r);
+				$r=str_replace('#site',$array['site'][$nb],$r);
+				
+				$r=str_replace('#url',$array['urlpage'][$nb],$r);
+				//$r=str_replace('#size',$array['filesize'][$nb],$r);
 				
 				
 				if (!USE_GOOGLE_THUMBS){
 					if (!empty($array['urltmb'][$nb])){
-						$repl='<img src="'.grab_google_thumb($array['urltmb'][$nb]).'" style="width:auto;height:'.$common_height.'px;"/>';
+						
+				
+						$repl='<img src="'.grab_google_thumb($array['urltmb'][$nb]).'" style="background-color:'.$array['color'][$nb].';width:'.($array['tw'][$nb]*$_SESSION['common_height'])/$array['th'][$nb].'px;height:'.$_SESSION['common_height'].'px;"/>';
 					}
 					else{
-						$repl='<img src="data:image/jpeg;base64'.str_replace('\\u003d','',$array['datatbm'][$nb]).'" style="width:auto;height:'.$common_height.'px;"/>';
+						$repl='<img src="data:image/jpeg;base64'.str_replace('\\u003d','',$array['datatbm'][$nb]).'" style="background-color:'.$array['color'][$nb].';width:'.($array['tw'][$nb]*$_SESSION['common_height'])/$array['th'][$nb].'px;height:'.$_SESSION['common_height'].'px;"/>';
 					}
 				}else if (USE_GOOGLE_THUMBS){
-					$repl='<img src="data:image/jpeg;base64'.str_replace('\\u003d','',$array['datatbm'][$nb]).'" style="width:auto;height:'.$common_height.'px;"/>';
+					$repl='<img src="'.$array['urltmb'][$nb].'" style="background-color:'.$array['color'][$nb].';width:'.($array['tw'][$nb]*$_SESSION['common_height'])/$array['th'][$nb].'px;height:'.$_SESSION['common_height'].'px;"/>';
 				}				
 				$r=str_replace('#thumbs',$repl,$r);
 				echo $r;
+
 			}	
 		}elseif($mode='videos'){ 
 			$nbresultsperpage=10;
@@ -391,7 +417,7 @@
 			}
 
 		}
-
+		if ($mode=='images'){echo '<div class="load_more" onClick="load_more(this,'.($start+1).')"><button>'.msg('load more').'</button></div>';}
 		if(!empty($array['nb_pages'])){
 			echo '<hr/><p class="footerlogo">'.LOGO1.str_repeat('<em class="o2">o</em>', $array['nb_pages']-1).LOGO2.'</p><div class="pagination">';
 			if ($start>0){echo '<a class="previous" title="'.msg('previous').'" href="?q='.urlencode($array['query']).'&mod='.$mode.'&start='.($start-$nbresultsperpage).'&lang='.$langue.$filtre.'">&#9668;</a>';}
@@ -468,7 +494,11 @@
 		$q_txt=$q_raw='';$title=msg('Googol - google without lies');
 		$noqueryclass=' noqueryclass ';
 	}
-
+	if (!empty($_GET['next'])){
+		# load more button -> ajax load, don't add html page
+		render_query(parse_query($q_raw,$start));
+		exit();
+	}
 ?>
 <!DOCTYPE html>
 <html dir="ltr" lang="fr">
@@ -582,7 +612,7 @@
 			</nav>		
 </header>
 
-<aside class="<?php echo $noqueryclass.' '.$mode;?>">
+<aside class="<?php echo $noqueryclass.' '.$mode;?>" id="list">
 	<?php if ($q_raw!=''){render_query(parse_query($q_raw,$start,$mode));} ?>
 </aside>
 <footer>
@@ -596,10 +626,33 @@
 </footer>
 <?php if(USE_WEB_OF_TRUST){echo '<script type="text/javascript" src="http://api.mywot.com/widgets/ratings.js"></script>';}?> 
 	<script language="javascript"> 
+		list=document.getElementById('list');
+		function get(url){	
+			request = new XMLHttpRequest();
+			request.open('GET', url, false);
+			request.send();
+			
+			if (request.readyState==4 && request.status==200){return request.responseText;}					
+			
+		}
 		function change_class(classe) { 
 			var btn = document.getElementById("color_selection"); 
 			btn.className= classe; 
 		} 
+		function load_more(obj,start){		
+			obj.innerHTML="<?php echo msg('loading...');?>";
+			if (start==1){start++;}
+			more=get("<?php 
+				$lacouleur=$lataille='';
+				if (!empty($couleur)){$lacouleur='&couleur='.$couleur;}
+				if (!empty($taille)){$lataille='&taille='.$taille;}
+				echo RACINE.'?q='.$q_raw.'&next=true&mod=images'.$lacouleur.$lataille.'&start=';
+
+			?>"+start);
+			obj.parentNode.removeChild(obj);
+			content=list.innerHTML;
+			list.innerHTML=content+more;
+		}
 	</script>
 </body>
 </html>
