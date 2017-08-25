@@ -33,7 +33,7 @@
 	define('URL','https://encrypted.google.com/search?hl='.LANGUAGE.SAFESEARCH_LEVEL.'&id=hp&q=');	
 	define('URLIMG','https://www.google.com/search?async=_id:rg_s,_pms:qs&hl='.LANGUAGE.SAFESEARCH_LEVEL.'&asearch=ichunk&id=hp&tbm=isch&q=');
 	define('URLVID','&tbm=vid');
-	define('VERSION','v1.8');
+	define('VERSION','v1.9');
 	define('USE_GOOGLE_THUMBS',true);
 	define('THEME','style_google.css');
 
