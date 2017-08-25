@@ -229,7 +229,7 @@
 		.Transparent,.Color, .couleur{color:black;}
 		.Color, .couleur{}
 		.Black_and_white,.Noir_et_blanc{background-color:#ddd!important;color:#444; txtb}
-
+		.highlighted{background-color: rgba(255,255,0,0.5);box-shadow: 0 0 2px rgba(255,255,0,0.5)}
 		@media screen and (max-width: 1100px){
 			.video{width:48%;}
 		}
