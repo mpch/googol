@@ -1,4 +1,4 @@
-<?php 
+<?php // !!!!!!!!!!!!!!!!!!!!!!!!!!!!! autres tailles link : http://images.google.fr/url?sa=t&rct=j&q=&source=imgres&cd=58&cad=rja&uact=8&ved=0ahUKEwiQ6vOamNrPAhUDsBQKHXlFA8E4ORCsEQgGMAA&url=%2Fsearch%3Fnum%3D10%26imgurl%3Dhttps%3A%2F%2Fleblavog.files.wordpress.com%2F2014%2F05%2Findex.jpg%26imgrefurl%3Dhttps%3A%2F%2Fleblavog.wordpress.com%2Ftag%2Flentourage%2F%26h%3D225%26w%3D225%26hl%3Dfr%26bih%3D734%26biw%3D1600%26tbm%3Disch%26tbnid%3DFKGG__DsUDIzgM%3A%26docid%3D7tGaFkl0KaQVFM%26tbs%3Dsimg%3Am00&usg=AFQjCNH3h84n-P9U5XuKv1_AxMz2W2Cj_A
 	session_start();
 	if (isset($_GET['lang'])){$langue=strip_tags($_GET['lang']);}else{$langue=strip_tags(lang());}
 	clear_cache();// vire les thumbs de plus de trois minutes
@@ -17,7 +17,7 @@
 	define('REGEX_VID_THMBS','#<img.*?src="([^"]+)".*?width="([0-9]+)"#');
 
 
-	define('TPL','<li class="result"><a rel="noreferrer" href="#link"><h3 class="title">#title</h3>#link</a>#wot<p class="description">#description</p></li>');
+	define('TPL','<li class="result"><a rel="noreferrer" href="#link"><h3 class="title">#title</h3>#higlightedlink</a>#wot<p class="description">#description</p></li>');
 	define('TPLIMG','<div class="image"><div><a rel="noreferrer" href="#link" title="#link">#thumbs</a></div><div class="description">#W x #H #proxylink <a class="source" href="#url" title="#url"> #site</a></div></div>');
 	define('TPLVID','<div class="video" ><h3><a rel="noreferrer" href="#link" title="#link">#titre</a></h3><a class="thumb" rel="noreferrer" href="#link" title="#link">#thumbs</a><p class="site">#site</p><p class="description">#description</p></div>');
 
@@ -33,7 +33,7 @@
 	define('URL','https://encrypted.google.com/search?hl='.LANGUAGE.SAFESEARCH_LEVEL.'&id=hp&q=');	
 	define('URLIMG','https://www.google.com/search?async=_id:rg_s,_pms:qs&hl='.LANGUAGE.SAFESEARCH_LEVEL.'&asearch=ichunk&id=hp&tbm=isch&q=');
 	define('URLVID','&tbm=vid');
-	define('VERSION','v1.9');
+	define('VERSION','v2.0');
 	define('USE_GOOGLE_THUMBS',true);
 	define('THEME','style_google.css');
 	$lang['fr']=array(
@@ -81,11 +81,25 @@
 		'!q'=>'https://www.qwant.com/?q=',
 		'!qi'=>'https://www.qwant.com/?t=images&q=',
 		);
-	if (!empty($_GET['captcha'])){
-		exit('location: '.$bangs['!ddg'].$query);
+
+	# Added in v2.0: request dispatch in case on bannishment ------------
+	include('googol_db_files_url.php');
+	// try get distant files if local googol_db is not present
+	$c=0;
+	while (!is_file('googol_db.php')){
+		if (
+			  !empty($googol_db_files_url[$c])
+			&&$googol_db_files_url_content=file_curl_contents($googol_db_files_url[$c])
+		){
+			file_put_contents('googol_db.php', $googol_db_files_url_content);
+		}elseif (empty($googol_db_files_url[$c])){
+			break;
+		}
+		$c++;
 	}
-
-
+	if (is_file('googol_db.php')){include('googol_db.php');}
+	else{ $googol_db=['https://duckduckgo.com'];}
+	# -------------------------------------------------------------------
 
 	if (!USE_GOOGLE_THUMBS){ 
 		session_start();
@@ -235,8 +249,11 @@
 
 
 			if (stripos($page,CAPCHA_DETECT)!==false){
+				# here, if bannished we redirect to other googols.
 				start_pause();
-				global $bangs;header('location: '.$bangs['!ddg'].$query);
+				global $googol_db;
+				$redirect_to=array_rand($googol_db);
+				header('location: '.$googol_db[$redirect_to].'/?q='.strip_tags($_GET['q']));
 				exit();
 			}
 			if (!$page){return false;}
@@ -350,7 +367,7 @@
 	}
 
 	function render_query($array){
-		global $start,$langue,$mode,$couleur,$taille;
+		global $start,$langue,$mode,$couleur,$taille,$q_txt;
 		if (!is_array($array)
 			||empty($array['urlimg'])&&empty($array['links'])
 			)
