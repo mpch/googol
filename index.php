@@ -332,6 +332,23 @@
 		}
 	}
 	function width($w,$h,$nh){return round(($nh*$w)/$h);}
+
+	function highlight($words='',$str=''){
+		if (empty($str)){return;}
+		if (empty($words)){return $str;}
+
+		$words=explode(' ',$words);
+		$regex = '#\\b(\\w*)(';
+	    $sep = '';
+	    foreach ($words as $word)
+	    {
+	        $regex .= $sep . preg_quote($word, '#');
+	        $sep = '|';
+	    }
+	    	    $regex .= ')(\\w*)\\b#i';
+	    return preg_replace($regex, '\\1<span class="highlighted">\\2</span>\\3', $str);
+	}
+
 	function render_query($array){
 		global $start,$langue,$mode,$couleur,$taille;
 		if (!is_array($array)
@@ -347,10 +364,11 @@
 				if (ORANGE_PROXY_URL){$orange_proxy_link='<a class=" wot-exclude" title="proxy" href="'.proxyfie($link).'"> (proxy)</a>';}else{$orange_proxy_link='';}
 		
 				$r=str_replace('#link',urldecode($link),TPL);
-				$r=str_replace('#title',$array['titles'][$nb],$r);
+				$r=str_replace('#higlightedlink',highlight($q_txt,urldecode($link)),TPL);
+				$r=str_replace('#title',highlight($q_txt,$array['titles'][$nb]),$r);
 				$d=str_replace('<br>','',$array['descriptions'][$nb].' '.$orange_proxy_link);
 				$d=str_replace('<br/>','',$d);
-				$r=str_replace('#description',$d,$r);
+				$r=str_replace('#description',highlight($q_txt,$d),$r);
 				if (preg_match('#http://(.*?)/#',$link,$domaine)){
 					$domaine='<a class="wot-exclude wot" href="'.WOT_URL.$domaine[1].'" title="View scorecard"> </a>';
 					$r=str_replace('#wot',$domaine,$r);
