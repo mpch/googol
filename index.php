@@ -1,5 +1,5 @@
-<?php // !!!!!!!!!!!!!!!!!!!!!!!!!!!!! autres tailles link : http://images.google.fr/url?sa=t&rct=j&q=&source=imgres&cd=58&cad=rja&uact=8&ved=0ahUKEwiQ6vOamNrPAhUDsBQKHXlFA8E4ORCsEQgGMAA&url=%2Fsearch%3Fnum%3D10%26imgurl%3Dhttps%3A%2F%2Fleblavog.files.wordpress.com%2F2014%2F05%2Findex.jpg%26imgrefurl%3Dhttps%3A%2F%2Fleblavog.wordpress.com%2Ftag%2Flentourage%2F%26h%3D225%26w%3D225%26hl%3Dfr%26bih%3D734%26biw%3D1600%26tbm%3Disch%26tbnid%3DFKGG__DsUDIzgM%3A%26docid%3D7tGaFkl0KaQVFM%26tbs%3Dsimg%3Am00&usg=AFQjCNH3h84n-P9U5XuKv1_AxMz2W2Cj_A
-	session_start();
+<?php
+      session_start();
 	if (isset($_GET['lang'])){$langue=strip_tags($_GET['lang']);}else{$langue=strip_tags(lang());}
 	clear_cache();// vire les thumbs de plus de trois minutes
 	define('LANGUAGE',$langue);
@@ -242,6 +242,13 @@
 		}
 	}
 
+	function transmitRequest(){
+		global $googol_db;
+		$redirect_to=array_rand($googol_db);
+		header('location: '.$googol_db[$redirect_to].'/?q='.strip_tags($_GET['q']));
+		exit();
+	}
+
 	function parse_query($query,$start=0){
 		global $mode,$filtre;
 		if ($mode=='web'){ 
@@ -251,10 +258,7 @@
 			if (stripos($page,CAPCHA_DETECT)!==false){
 				# here, if bannished we redirect to other googols.
 				start_pause();
-				global $googol_db;
-				$redirect_to=array_rand($googol_db);
-				header('location: '.$googol_db[$redirect_to].'/?q='.strip_tags($_GET['q']));
-				exit();
+				transmitRequest();
 			}
 			if (!$page){return false;}
 			preg_match_all(REGEX_WEB, $page, $r);
@@ -519,7 +523,9 @@
 	elseif (!empty($_GET['taille'])&&!empty($_GET['couleur'])){$taille=strip_tags($_GET['taille']);$couleur=strip_tags($_GET['couleur']);$filtre=$couleur.','.$taille;}
 	else{$filtre=$taille=$couleur='';}
 	if (isset($_GET['q'])){
-		if (still_pause()){header('location: '.$bangs['!ddg'].strip_tags($_GET['q']));exit();}
+		if (still_pause()){
+			transmitRequest();
+		}
 		handle_bangs($_GET['q']);
 		$q_raw=$_GET['q'];
 		$q_txt=strip_tags($_GET['q']);
