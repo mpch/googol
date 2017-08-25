@@ -36,19 +36,6 @@
 	define('VERSION','v1.9');
 	define('USE_GOOGLE_THUMBS',true);
 	define('THEME','style_google.css');
-
-	if (!empty($_GET['captcha'])){
-		exit('location: '.$bangs['!ddg'].$query);
-	}
-
-
-
-	if (!USE_GOOGLE_THUMBS){ 
-		session_start();
-		if (!isset($_SESSION['ID'])){$_SESSION['ID']=uniqid();}
-		define('UNIQUE_THUMBS_PATH','thumbs/'.$_SESSION['ID']);
-		if (!is_dir('thumbs')){mkdir('thumbs');}// crée le dossier thumbs si nécessaire
-	}
 	$lang['fr']=array(
 		'previous'=>strip_tags('Page précédente'),
 		'next'=>'Page suivante',
@@ -94,6 +81,19 @@
 		'!q'=>'https://www.qwant.com/?q=',
 		'!qi'=>'https://www.qwant.com/?t=images&q=',
 		);
+	if (!empty($_GET['captcha'])){
+		exit('location: '.$bangs['!ddg'].$query);
+	}
+
+
+
+	if (!USE_GOOGLE_THUMBS){ 
+		session_start();
+		if (!isset($_SESSION['ID'])){$_SESSION['ID']=uniqid();}
+		define('UNIQUE_THUMBS_PATH','thumbs/'.$_SESSION['ID']);
+		if (!is_dir('thumbs')){mkdir('thumbs');}// crée le dossier thumbs si nécessaire
+	}
+	
 
 
 	#######################################################################
