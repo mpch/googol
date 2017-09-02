@@ -1,8 +1,10 @@
 googol
 ======
 
-http://googl.freecluster.eu/
+http://www.atopa.ga/
 
-http://searx.rf.gd/
+http://www.atopa.ml
 
-http://googl.epizy.com
+http://searx.dx.am/
+
+http://search.x10host.com/
