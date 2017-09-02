@@ -1,9 +1,9 @@
 googol
 ======
 
-http://www.atopa.ga/
+https://www.atopa.ga/
 
-http://www.atopa.ml
+https://www.atopa.ml
 
 http://searx.dx.am/
 
