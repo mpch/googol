@@ -5,7 +5,7 @@
 	define('LANGUAGE',$langue);
 	define('PAUSE_DURATION',60); // minutes
 	define('RACINE',getRacine());
-	define('USE_WEB_OF_TRUST',true);
+	define('USE_WEB_OF_TRUST',false);
 	define('ORANGE_PROXY_URL','');
 	define('WOT_URL','http://www.mywot.com/scorecard/');
 	define('REGEX_WEB','#(?<=<h3 class="r"><a href="/url\?q=)([^&]+).*?>(.*?)</a>.*?(?<=<span class="st">)(.*?)(?=</span>)#s');
