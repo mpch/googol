@@ -45,9 +45,9 @@
 			.logo.noqueryclass{margin-left:0;display:block;font-size: 140px!important; line-height:160px;text-align:center;}
 			.logo.noqueryclass+span{display:block;text-align:center;}
 			aside.noqueryclass{border:none;}
-			aside{background-color:#F1F1F1;border-top:1px solid #e5e5e5;}
+			aside{border-top:1px solid #e5e5e5;}
 		header .msg{font-size:12px;color:#777;font-style:italic;padding:0 10px;text-align:center;}
-		header .top{margin:0;margin-bottom:15px;padding:10px;text-align:left;font-weight: bold;color:#aaa;background-color:#f1f1f1;border-bottom:1px solid #e5e5e5;}
+		header .top{margin:0;margin-bottom:15px;padding:10px;text-align:left;font-weight: bold;color:#aaa;border-bottom:1px solid #e5e5e5;}
 		
 		header .top a:hover{color:#aaa;}
 		header .top a{color:#888;}
