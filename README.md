@@ -3,8 +3,6 @@ googol
 
 https://www.atopa.ga/
 
-https://www.atopa.ml
+https://www.busca.ga/
 
-http://searx.dx.am/
-
-http://search.x10host.com/
+https://www.busca.gq/
