@@ -17,7 +17,7 @@
 	define('REGEX_VID_THMBS','#<img.*?src="([^"]+)".*?width="([0-9]+)"#');
 
 
-	define('TPL','<li class="result"><a rel="noreferrer" href="#link"><h3 class="title">#title</h3>#higlightedlink</a>#wot<p class="description">#description</p></li>');
+	define('TPL','<li class="result"><a rel="noreferrer" href="#link"><h3 class="title">#title</h3>#higlightedlink</a><p class="description">#description</p></li>');
 	define('TPLIMG','<div class="image"><div><a rel="noreferrer" href="#link" title="#link">#thumbs</a></div><div class="description">#W x #H #proxylink <a class="source" href="#url" title="#url"> #site</a></div></div>');
 	define('TPLVID','<div class="video" ><h3><a rel="noreferrer" href="#link" title="#link">#titre</a></h3><a class="thumb" rel="noreferrer" href="#link" title="#link">#thumbs</a><p class="site">#site</p><p class="description">#description</p></div>');
 
@@ -252,7 +252,7 @@
 	function parse_query($query,$start=0){
 		global $mode,$filtre;
 		if ($mode=='web'){ 
-			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).'&start='.$start.'&num=100',false);
+			$page=file_curl_contents(URL.str_replace(' ','+',urlencode($query)).'&start='.$start.'&num=15',false);
 
 
 			if (stripos($page,CAPCHA_DETECT)!==false){
@@ -354,22 +354,6 @@
 	}
 	function width($w,$h,$nh){return round(($nh*$w)/$h);}
 
-	function highlight($words='',$str=''){
-		if (empty($str)){return;}
-		if (empty($words)){return $str;}
-
-		$words=explode(' ',$words);
-		$regex = '#\\b(\\w*)(';
-	    $sep = '';
-	    foreach ($words as $word)
-	    {
-	        $regex .= $sep . preg_quote($word, '#');
-	        $sep = '|';
-	    }
-	    	    $regex .= ')(\\w*)\\b#i';
-	    return preg_replace($regex, '\\1<span class="highlighted">\\2</span>\\3', $str);
-	}
-
 	function render_query($array){
 		global $start,$langue,$mode,$couleur,$taille,$q_txt;
 		if (!is_array($array)
@@ -379,21 +363,17 @@
 
 		if ($mode=='web'){
 			echo '<ul start="'.$start.'">';
-			$nbresultsperpage=100;
+			$nbresultsperpage=15;
 			$filtre='';
 			foreach ($array['links'] as $nb => $link){
 				if (ORANGE_PROXY_URL){$orange_proxy_link='<a class=" wot-exclude" title="proxy" href="'.proxyfie($link).'"> (proxy)</a>';}else{$orange_proxy_link='';}
 		
 				$r=str_replace('#link',urldecode($link),TPL);
-				$r=str_replace('#higlightedlink',highlight($q_txt,urldecode($link)),$r);
-				$r=str_replace('#title',highlight($q_txt,$array['titles'][$nb]),$r);
+				$r=str_replace('#higlightedlink',urldecode($link),$r);
+				$r=str_replace('#title',$array['titles'][$nb],$r);
 				$d=str_replace('<br>','',$array['descriptions'][$nb].' '.$orange_proxy_link);
 				$d=str_replace('<br/>','',$d);
-				$r=str_replace('#description',highlight($q_txt,$d),$r);
-				if (preg_match('#http://(.*?)/#',$link,$domaine)){
-					$domaine='<a class="wot-exclude wot" href="'.WOT_URL.$domaine[1].'" title="View scorecard"> </a>';
-					$r=str_replace('#wot',$domaine,$r);
-				}else{$r=str_replace('#wot','',$r);}
+				$r=str_replace('#description',$d,$r);
 
 				echo $r;
 			}
@@ -563,12 +543,6 @@
 				<input type="submit" value="OK"/>
 			</span>
 
-			
-			<div class="lang">
-				<a class="<?php is_active(LANGUAGE,'fr'); ?>" href="?lang=fr">FR</a> 
-				<a class="<?php is_active(LANGUAGE,'en'); ?>" href="?lang=en">EN</a>
-			</div><div style="clear:both;"></div>
-
 		</div>
 
 	
@@ -638,12 +612,6 @@
 
 
 	</form>
-	<p class="msg nomobile <?php echo $noqueryclass;?>">
-		<?php 
-			echo msg('Search anonymously on Google (direct links, fake referer, no ads)'); 
-			if ($mode!='web'){	echo '<br/>'.msg('The thumbnails are temporarly stored in this server to hide your ip from Google…');	} 
-		?> 
-	</p>
 				<nav>
 			<?php 
 				if ($mode=='web'){echo '<li class="active">Web</li><li><a href="?q='.urlencode($q_raw).'&mod=images&lang='.$langue.'">Images</a></li><li><a href="?q='.urlencode($q_raw).'&mod=videos&lang='.$langue.'">'.msg('Videos').'</a></li>';}
@@ -657,13 +625,7 @@
 	<?php if ($q_raw!=''){render_query(parse_query($q_raw,$start,$mode));} ?>
 </aside>
 <footer>
-	<span class="version"> <?php echo return_safe_search_level(); ?> </span>
-		
-		<span class="nomobile infos">
-			<a href="<?php echo RACINE;?>">Googol <?php echo strip_tags(VERSION);?></a> <?php echo msg('by');?> 
-			<a href="http://warriordudimanche.net">Bronco - warriordudimanche.net</a> 
-			<a href="https://github.com/broncowdd/googol" title="<?php echo msg('on GitHub');?>" class=" wot-exclude "> GitHub </a>
-		</span>
+	<span class="version"> </span>
 </footer>
 <?php if(USE_WEB_OF_TRUST){echo '<script type="text/javascript" src="http://api.mywot.com/widgets/ratings.js"></script>';}?> 
 	<script language="javascript"> 
