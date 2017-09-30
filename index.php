@@ -23,7 +23,7 @@
 
 
 	define('LOGO1','<a href="'.RACINE.'"><em class="g">G</em><em class="o1">o</em>');
-	define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="o1">o</em><em class="l">l</em></a>');
+	define('LOGO2','<em class="o2">o</em><em class="g">g</em><em class="l">l</em><em class="o1">e</em></a>');
 	define('CAPCHA_DETECT','Our systems have detected unusual traffic from your computer network.');
 	define('SAFESEARCH_ON','&safe=on');
 	define('SAFESEARCH_IMAGESONLY','&safe=images');
@@ -43,7 +43,7 @@
 		'The thumbnails are temporarly stored in this server to hide your ip from Google…'=>strip_tags('les miniatures sont temporairement récupérées sur ce serveur, google n\'a pas votre IP…'),
 		'Search anonymously on Google (direct links, fake referer, no ads)'=>strip_tags('Rechercher anonymement sur Google (Pas de pubs, liens directs et referrer caché)'),
 		'Free and open source (please keep a link to warriordudimanche.net for the author ^^)'=>strip_tags('Libre et open source, merci de laisser un lien vers warriordudimanche.net pour citer l\'auteur ;)'),
-		'Googol - google without lies'=>'Googol - google sans mensonge',
+		'Googol'=>'Googol',
 		'on GitHub'=>'sur GitHub',
 		'no results for'=>strip_tags('pas de résultat pour '),
 		'by'=>'par',
@@ -231,7 +231,7 @@
 			file_put_contents('googol.xml', '<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
 			  xmlns:moz="http://www.mozilla.org/2006/browser/search/">
 			  <ShortName>Googol</ShortName>
-			  <Description>'.msg('Googol - google without lies').'</Description>
+			  <Description>'.msg('Googol').'</Description>
 			  <InputEncoding>UTF-8</InputEncoding>
 			  <Image width="32" height="32">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABCFJREFUeNrEV21MW2UUfm7v7QcwWqj9YBQyEAdqwBGGY3xkQRlLRjLnsmnUOOOSJYsmxvhDo/7VRH+YaPxhYqLRiAkuccbh5jbFRZgR3IbpwphG0wxaSgOUXgot7W177/V9L/DDrLv3bcK2kzy97e15zz3vOc85573c4bfOY112ruNuyATBKP0iQNVufETwKu6ufElwTFBVtf0ePJzKiwQniQNoLmRVYyUHT5kNT3f7YLbatHtkE4gvr+LsWATT82kEoszm2gVFVZk0K+0qnulwoM7nAG82gxfM2n2OM5HfAjzeYhw76EIuk8HV6zP4engBYoozMmuhKTB8eJ0LeHlvGc74VzHwexyz8f//73NweNBnRU9rJWq3VaBzVwNqKkrwdv9NpHP6Thg6QHfe12TDO6dFiKv5dWaWVIIUhiYDeK4rhid7m+D2utDkm8blKUXXvommQA9HO4rw1Wgai0l9vQ2cGotBSiaQTafwz5xsqC+oOg4+QEIfJrtbTLCTtLyIQyqxjIGLIaZ1gqLcPgVVTko2CxQlxexAx3YbRv4M46cJtjW6HOA4DntaqiApPC5eEzEj6uezs94Kj8OCjy8sMTusG4EbYYlEQMChfU040C1BzmZJzed3wmTiwfE8hq8GYeVFpLKsDuiQIBgDBkcCOLyvEcX2MvC8QMNyW31VUdDbaSNlCbzRH2JMgaJfhv3DIubFcRx5rAZljhItLXkjQJyzFhVrTcphL4aRXaYUbMg5f5Jg0lDv2T0ezdFvfw1CYXaAsRWziN2SwXdDf+FHf2JzSJhPdtaYsbvBjrb6LWuVQsgXislaCn6biOLMeLwge0yzYENe6fPi8UercWUygte+CCK6osBVasKJ/T50tdaiurIcgYifVE+W2aaJMpcFT7U7sL/7ISQlBR9+P4OFeE67T6/vfjONqdA8vF433jvRgupyDqx2TQr5MIKzBDja97A2/3+4NIVEWr5FZ+DnAGQ5h1KnG4c6PGCxS2Gi5WKEtu0lsG0p1UK2nJDy6oz9TQaQlNac7GmrAYtdCiYOVDhthGQ8NnTzrUlKZLqRCNA+QQl5H+FodEVlaUSKoVIimdUeSjshdUZvjSzLWIonCTdkRhISw0b4N5wgRy0JJjIXdjVuzatTZFnrhlkphV/+mAaLXQqmKrgeTCOysKql4f7areh5xH6LTm9zuTaQZkNhnBqZZa4C3U74wfNubKtyacSyWbNYic5rUXj9hRZymhnHkH9t7O7d4cDxJ+oRCUfw5qfXMLcsM/cBrvnIZy+R6yesCw7udqK1wY0ddXbkshJlJObEDM5dmcPg5aVCu/f7AgqcBadHFzVslhTUiu+AZOh54OY9dOAGLcPzBJ+zls0m4izBSXLG0lJwnL4oEnTRxneHdx1bfzUfpD/+E2AAqmeV253DYKAAAAAASUVORK5CYII=</Image>
 			  <Url type="text/html" method="get" template="'.RACINE.'">
@@ -512,7 +512,7 @@
 		$title=$q_txt.' - Googol '.msg('search ');
 		$noqueryclass='';
 	}else{
-		$q_txt=$q_raw='';$title=msg('Googol - google without lies');
+		$q_txt=$q_raw='';$title=msg('Googol');
 		$noqueryclass=' noqueryclass ';
 	}
 	if (!empty($_GET['next'])){
@@ -529,7 +529,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<?php if (is_file('favicon.png')){echo '<link rel="shortcut icon" href="favicon.png" /> ';}?>
 	<link rel="stylesheet" type="text/css" href="<?php echo THEME;?>"  media="screen" />
-	<link rel="search" type="application/opensearchdescription+xml" title="<?php echo msg('Googol - google without lies'); ?>" href="<?php echo RACINE;?>/googol.xml">
+	<link rel="search" type="application/opensearchdescription+xml" title="<?php echo msg('Googol'); ?>" href="<?php echo RACINE;?>/googol.xml">
 
 	<!--[if IE]><script> document.createElement("article");document.createElement("aside");document.createElement("section");document.createElement("footer");</script> <![endif]-->
 </head>

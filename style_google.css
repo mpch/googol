@@ -1,10 +1,4 @@
-@font-face {
-  font-family: 'Quicksand';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Quicksand Bold'), local('Quicksand-Bold'), url(Quicksand_Regular.woff) format('woff');
-}
-		*{-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}
+*{-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}
 		html{
 		     height:100%;    
 		  }
@@ -31,7 +25,6 @@
 		footer:hover{opacity:1;}
 		header  em, .footerlogo em{
 			vertical-align:middle;
-			font-family:'Quicksand', Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace;
 			font-weight:normal;
 			font-style: normal;
 			-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}
@@ -42,7 +35,7 @@
 		header span{white-space :nowrap;margin:0;padding:0;}
 		header span.logo{margin-left:10px;font-size:30px;}
 			p.noqueryclass{display:block;text-align:center;}
-			.logo.noqueryclass{margin-left:0;display:block;font-size: 140px!important; line-height:160px;text-align:center;}
+			.logo.noqueryclass{margin-left:0;display:block;font-size: 100px!important; line-height:160px;text-align:center;}
 			.logo.noqueryclass+span{display:block;text-align:center;}
 			aside.noqueryclass{border:none;}
 			aside{border-top:1px solid #e5e5e5;}
